@@ -11,7 +11,7 @@ figma.ui.onmessage = msg => {
     figma.closePlugin(msg);
 };
 const exportSlide = (frameNode, index) => __awaiter(this, void 0, void 0, function* () {
-    const svg = yield frameNode.exportAsync({ format: 'SVG' });
+    const svg = yield frameNode.exportAsync({ format: 'SVG', svgOutlineText: false });
     figma.ui.postMessage({ svg, index });
 });
 (() => __awaiter(this, void 0, void 0, function* () {

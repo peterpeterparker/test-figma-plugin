@@ -6,7 +6,7 @@ figma.ui.onmessage = msg => {
 }
 
 const exportSlide = async (frameNode, index) => {
-    const svg = await frameNode.exportAsync({format: 'SVG'})
+    const svg = await frameNode.exportAsync({format: 'SVG', svgOutlineText: false})
     figma.ui.postMessage({ svg, index })
 }
 
