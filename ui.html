@@ -1,0 +1,18 @@
+<script>
+  window.onmessage = async (event) => {
+    const { svg } = event.data.pluginMessage;
+
+    console.log('SVG', svg);
+
+    let blob = new Blob([svg], { type: 'image/svg+xml' })
+
+    const blobURL = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = blobURL
+    link.download = `yolo.svg`
+    link.click()
+
+    window.parent.postMessage({ pluginMessage: 'Done.' }, '*');
+  }
+
+</script>
