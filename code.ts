@@ -5,21 +5,31 @@ figma.ui.onmessage = msg => {
   figma.closePlugin(msg)
 }
 
+const exportSlide = async (frameNode, index) => {
+    const svg = await frameNode.exportAsync({format: 'SVG'})
+    figma.ui.postMessage({ svg, index })
+}
+
 (async () => {
     try {
       figma.showUI(__html__, { visible: false })
 
-      const nodes = figma.root.findAll();
+        const selected = figma.currentPage.selection[0];
 
-// nodes.forEach(node =>  console.log(node));
+      if (selected && selected.type === 'FRAME') {
+          await exportSlide(selected, 0);
+          return;
+      }
 
-      const selected = figma.currentPage.selection[0];
-      console.log('Node', selected);
+      const nodes = figma.root.findAll(node => node.type === "FRAME");
+      if (nodes) {
+          const promises = nodes.map((node, i) => exportSlide(node, i));
+          await Promise.all(promises);
 
-      const svg = await selected.exportAsync({format: 'SVG'})
-      figma.ui.postMessage({ svg })
+          return;
+      }
 
-      console.log('Postmsg done')
+      figma.closePlugin('Nothing to export');
     } catch (e) {
         console.error(e);
     }

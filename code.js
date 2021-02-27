@@ -10,16 +10,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 figma.ui.onmessage = msg => {
     figma.closePlugin(msg);
 };
+const exportSlide = (frameNode, index) => __awaiter(this, void 0, void 0, function* () {
+    const svg = yield frameNode.exportAsync({ format: 'SVG' });
+    figma.ui.postMessage({ svg, index });
+});
 (() => __awaiter(this, void 0, void 0, function* () {
     try {
         figma.showUI(__html__, { visible: false });
-        const nodes = figma.root.findAll();
-        // nodes.forEach(node =>  console.log(node));
         const selected = figma.currentPage.selection[0];
-        console.log('Node', selected);
-        const svg = yield selected.exportAsync({ format: 'SVG' });
-        figma.ui.postMessage({ svg });
-        console.log('Postmsg done');
+        if (selected && selected.type === 'FRAME') {
+            yield exportSlide(selected, 0);
+            return;
+        }
+        const nodes = figma.root.findAll(node => node.type === "FRAME");
+        if (nodes) {
+            const promises = nodes.map((node, i) => exportSlide(node, i));
+            yield Promise.all(promises);
+            return;
+        }
+        figma.closePlugin('Nothing to export');
     }
     catch (e) {
         console.error(e);
